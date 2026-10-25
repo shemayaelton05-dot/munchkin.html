@@ -1,0 +1,466 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Little Gifts for Munchkin</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600&family=Nunito:wght@400;600;700&family=Gochi+Hand&display=swap">
+<style>
+/* Layout: five pastel gift boxes (24 to 28 Oct) that unwrap one per day; each opens a soft card below. Floating stars and little flowers behind. Deliberately single light, cute look. */
+:root{
+  --blush:#ffe6ee; --cream:#fff8ef; --card:#ffffff; --ink:#55394a; --soft:#8c7080;
+  --pink:#f9799f; --rose:#ffb8cb; --lav:#cbb8ff; --mint:#b8ead8; --peach:#ffd3b0; --butter:#fff1a8; --night:#3b3a6b;
+  --round:"Fredoka","Nunito",system-ui,sans-serif; --body:"Nunito",system-ui,sans-serif; --hand:"Gochi Hand","Segoe Print",cursive;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html,body{color:var(--ink);background:linear-gradient(180deg,var(--blush),var(--cream) 55%,#f1ebff);background-attachment:fixed;background-color:var(--blush)}
+body{font-family:var(--body);font-size:17px;line-height:1.65;overflow-x:hidden;min-height:100vh;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+#bg{position:fixed;inset:0;z-index:0;pointer-events:none}
+main{position:relative;z-index:1;max-width:600px;margin:0 auto;padding-block:40px 80px;display:flex;flex-direction:column;gap:28px}
+h1,h2{font-family:var(--round);font-weight:600;margin:0;line-height:1.15;text-wrap:balance;color:var(--ink)}
+h1{font-size:clamp(2rem,8vw,2.8rem)}
+h2{font-size:clamp(1.5rem,6vw,2rem)}
+h1 span,h2 span{color:var(--pink)}
+p{margin:0}
+
+header{text-align:center;display:flex;flex-direction:column;align-items:center;gap:10px}
+.hi{font-family:var(--hand);font-size:clamp(1.9rem,7.5vw,2.5rem);color:var(--pink);line-height:1.1}
+header .sub{color:var(--soft);max-width:34ch}
+
+.gifts{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;align-items:end}
+.gift{border:0;background:none;padding:0;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:6px;min-width:0;font:inherit;color:var(--ink)}
+.gift:focus-visible{outline:3px dashed var(--pink);outline-offset:4px;border-radius:12px}
+.box{position:relative;width:100%;max-width:84px;aspect-ratio:1/1;margin-top:18px;transition:transform .25s}
+.box .base{position:absolute;inset:22% 6% 0;border-radius:10px;background:var(--c)}
+.box .lid{position:absolute;left:0;right:0;top:10%;height:20%;border-radius:8px;background:var(--c);filter:brightness(1.04);box-shadow:0 3px 0 rgba(85,57,74,.12);transition:transform .6s cubic-bezier(.3,1.6,.5,1)}
+.box .rib{position:absolute;left:44%;width:12%;top:10%;bottom:0;background:#fff;opacity:.85;border-radius:3px}
+.box .bow{position:absolute;left:50%;top:-6%;transform:translateX(-50%);width:56%;height:26%;transition:transform .6s cubic-bezier(.3,1.6,.5,1)}
+.box .bow::before,.box .bow::after{content:"";position:absolute;top:0;width:48%;height:100%;border:4px solid #fff;border-radius:50%/60% 60% 40% 40%}
+.box .bow::before{left:0;transform:rotate(-18deg)}
+.box .bow::after{right:0;transform:rotate(18deg)}
+.gift.open .lid{transform:translateY(-34%) rotate(-12deg)}
+.gift.open .bow{transform:translate(-62%,-60%) rotate(-12deg)}
+.gift.cur .base{box-shadow:0 0 0 3px #fff,0 0 0 6px var(--pink)}
+.gift:not(:disabled):hover .box{transform:translateY(-3px)}
+.gift:disabled{cursor:default}
+.gift:disabled .box{filter:grayscale(.55) opacity(.6)}
+.gift .dt{font-family:var(--round);font-weight:600;font-size:.95rem;line-height:1.1;font-variant-numeric:tabular-nums}
+.gift .st{font-size:.72rem;color:var(--soft);white-space:nowrap}
+.next{text-align:center;color:var(--soft);font-size:.92rem;font-variant-numeric:tabular-nums;min-height:1.5em}
+
+.card{position:relative;background:var(--card);border-radius:24px;padding:34px clamp(20px,6vw,36px) 30px;box-shadow:0 18px 40px -18px rgba(249,121,159,.45);display:flex;flex-direction:column;gap:16px}
+.card[hidden]{display:none}
+.card::before{content:"";position:absolute;top:-12px;left:50%;width:96px;height:26px;transform:translateX(-50%) rotate(-3deg);background:rgba(255,184,203,.75);border-radius:4px}
+.tag{align-self:flex-start;font-family:var(--round);font-weight:500;font-size:.82rem;color:var(--pink);background:var(--blush);padding:4px 12px;border-radius:999px}
+.letter{font-family:var(--hand);font-size:1.4rem;line-height:1.5;color:var(--ink)}
+.letter p+p{margin-top:12px}
+.from{text-align:right;color:var(--pink)}
+.soft{color:var(--soft)}
+.center{text-align:center}
+
+.book{background:var(--cream);border-radius:22px;padding:22px 16px 16px;display:flex;flex-direction:column;align-items:center;gap:16px;box-shadow:inset 0 0 0 2px #ffe0e9}
+.page{display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center;min-height:330px;justify-content:center;animation:turn .55s ease}
+@keyframes turn{from{opacity:0;transform:perspective(900px) rotateY(-28deg) translateX(24px)}}
+.page svg{width:min(200px,60vw);height:auto;max-width:100%}
+.page .pn{font-family:var(--round);font-size:.78rem;letter-spacing:.14em;text-transform:uppercase;color:var(--pink)}
+.page p{font-family:var(--hand);font-size:1.45rem;line-height:1.45;max-width:30ch;color:var(--ink)}
+.page .from{align-self:flex-end}
+.pnav{display:flex;align-items:center;justify-content:space-between;width:100%;gap:10px}
+.pbtn{width:44px;height:44px;border-radius:50%;border:0;background:var(--pink);color:#fff;font:600 1.6rem/1 var(--round);cursor:pointer;box-shadow:0 4px 0 #e3638b;flex:none}
+.pbtn:disabled{background:#f1dbe3;box-shadow:none;cursor:default}
+.pbtn:focus-visible{outline:3px solid var(--ink);outline-offset:3px}
+.dots{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
+.dots span{width:8px;height:8px;border-radius:4px;background:var(--rose);opacity:.5;transition:width .3s}
+.dots span.on{width:22px;opacity:1;background:var(--pink)}
+.song{display:flex;align-items:center;gap:16px;background:var(--blush);border-radius:20px;padding:16px 18px;margin-top:6px}
+.disc{flex:none;width:64px;height:64px;border-radius:50%;background:radial-gradient(circle,#fff 0 12%,var(--pink) 13% 20%,var(--lav) 21% 100%);animation:spin 5s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.si{display:flex;flex-direction:column;min-width:0}
+.si .sl{font-size:.78rem;letter-spacing:.12em;text-transform:uppercase;color:var(--pink)}
+.si strong{font-family:var(--round);font-weight:600;font-size:1.4rem;line-height:1.2}
+.si .sa{color:var(--soft);font-size:.95rem}
+a.btn{text-decoration:none;display:inline-block}
+.drop{stroke:#dfe8f7;stroke-width:1.6;stroke-linecap:round;animation:rain .9s linear infinite}
+@keyframes rain{from{transform:translateY(-30px)}to{transform:translateY(80px)}}
+.blooms{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+@media (max-width:440px){.blooms{grid-template-columns:repeat(2,1fr)}}
+.fb{border:0;font:inherit;cursor:pointer;border-radius:20px;background:var(--cream);min-height:124px;padding:12px;display:flex;align-items:center;justify-content:center;text-align:center;color:var(--ink);transition:transform .25s,background .3s}
+.fb:hover{transform:scale(1.04)}
+.fb:focus-visible{outline:3px solid var(--pink);outline-offset:2px}
+.fb svg{width:52px;height:52px;animation:sway 3s ease-in-out infinite}
+.fb:nth-child(2n) svg{animation-delay:.8s}
+@keyframes sway{50%{transform:rotate(14deg) scale(1.06)}}
+.fb .m{font-size:.95rem;line-height:1.4}
+.fb.on{background:#fff2f6;box-shadow:inset 0 0 0 2px var(--rose)}
+.count{color:var(--soft);font-size:.9rem;text-align:center}
+
+.nightsky{position:relative;border-radius:20px;overflow:hidden;background:linear-gradient(180deg,#2f2c5e,var(--night) 60%,#5b4a86);min-height:220px;display:flex;align-items:flex-end;justify-content:center;padding:16px}
+.nightsky .star{position:absolute;width:6px;height:6px;border-radius:50%;background:#fff6c9;opacity:0;transition:opacity .8s;box-shadow:0 0 8px #fff6c9}
+.nightsky.lit .star{opacity:1;animation:tw 2.4s ease-in-out infinite}
+@keyframes tw{50%{opacity:.35}}
+.moon{position:absolute;top:22px;right:26px;width:74px;height:74px}
+.desk{width:100%;max-width:300px;height:auto}
+.nightsky .time{position:absolute;top:22px;left:20px;font-family:var(--round);font-weight:600;font-size:1.5rem;color:#fff6c9;font-variant-numeric:tabular-nums}
+.lines{display:flex;flex-direction:column;gap:10px}
+.lines p{background:var(--cream);border-radius:14px;padding:10px 14px;opacity:0;transform:translateY(8px);transition:opacity .6s,transform .6s}
+.lines p.show{opacity:1;transform:none}
+
+.credits{border-radius:20px;background:var(--night);color:#f3eaff;padding:26px 18px;display:flex;flex-direction:column;gap:12px;text-align:center}
+.credits .ct{font-family:var(--round);letter-spacing:.2em;text-transform:uppercase;font-size:.8rem;color:var(--butter)}
+.credits .r{display:flex;flex-direction:column;gap:0;opacity:0;transform:translateY(10px);transition:opacity .7s,transform .7s}
+.credits .r.show{opacity:1;transform:none}
+.credits .role{font-size:.85rem;color:#b9b0dc}
+.credits .who{font-family:var(--round);font-weight:600;font-size:1.25rem;color:#fff}
+.credits .r.zero .who{color:var(--rose)}
+.credits .r.final .who{color:var(--butter);font-size:1.5rem}
+
+.btn{align-self:center;font:600 1rem var(--round);border:0;border-radius:999px;padding:13px 26px;cursor:pointer;background:var(--pink);color:#fff;box-shadow:0 6px 0 #e3638b}
+.btn:active{transform:translateY(3px);box-shadow:0 3px 0 #e3638b}
+.btn.light{background:var(--lav);color:var(--ink);box-shadow:0 6px 0 #a996e6}
+.btn:focus-visible{outline:3px solid var(--ink);outline-offset:3px}
+.row{display:flex;flex-wrap:wrap;gap:12px;justify-content:center}
+
+.env{position:relative;width:min(280px,80vw);aspect-ratio:3/2;max-width:100%;align-self:center;border:0;padding:0;background:none;cursor:pointer}
+.env:focus-visible{outline:3px dashed var(--pink);outline-offset:6px;border-radius:10px}
+.env .b{position:absolute;inset:0;background:var(--rose);border-radius:12px}
+.env .f{position:absolute;left:0;right:0;top:0;height:60%;background:#ffcad8;clip-path:polygon(0 0,100% 0,50% 100%);transform-origin:top;transition:transform .7s;z-index:2}
+.env .seal{position:absolute;left:50%;top:48%;width:48px;height:48px;transform:translate(-50%,-50%);z-index:3;transition:opacity .4s}
+.env.open .f{transform:rotateX(180deg)}
+.env.open .seal{opacity:0}
+.promise{text-align:center;font-family:var(--hand);font-size:1.6rem;line-height:1.4;color:var(--ink);background:var(--blush);border-radius:18px;padding:20px}
+.stack{display:flex;flex-direction:column;gap:14px}
+.stack[hidden]{display:none}
+
+.cake{display:flex;flex-direction:column;align-items:center;margin-top:8px}
+.candles{display:flex;gap:14px;align-items:flex-end;margin-bottom:-2px;z-index:1}
+.cdl{border:0;background:none;padding:0 2px;cursor:pointer;display:flex;flex-direction:column;align-items:center}
+.cdl:focus-visible{outline:2px dashed var(--pink);outline-offset:3px;border-radius:6px}
+.fl{width:14px;height:22px;border-radius:50% 50% 45% 45%/60% 60% 40% 40%;background:radial-gradient(ellipse at 50% 75%,#fffbe0 0 25%,#ffc75a 50%,rgba(255,199,90,0) 72%);transform-origin:50% 100%;animation:fk 2s ease-in-out infinite;transition:opacity .4s,transform .4s}
+.cdl.out .fl{opacity:0;transform:scale(.2);animation:none}
+@keyframes fk{50%{transform:scale(1.06,.94) rotate(3deg)}}
+.stk{width:9px;height:38px;border-radius:3px;background:repeating-linear-gradient(135deg,#fff 0 5px,var(--pink) 5px 10px)}
+.layer{position:relative;max-width:100%}
+.l1{width:min(220px,64vw);height:58px;background:var(--rose);border-radius:16px 16px 10px 10px}
+.l1::before{content:"";position:absolute;left:0;right:0;top:0;height:22px;background:#fff;border-radius:16px 16px 0 0;
+  clip-path:polygon(0 0,100% 0,100% 60%,92% 100%,84% 60%,76% 100%,68% 60%,60% 100%,52% 60%,44% 100%,36% 60%,28% 100%,20% 60%,12% 100%,4% 60%,0 80%)}
+.l2{width:min(280px,82vw);height:62px;background:var(--lav);border-radius:14px 14px 10px 10px;margin-top:-2px}
+.l2 i{position:absolute;width:8px;height:8px;border-radius:50%;background:#fff;top:28px}
+.plate{width:min(320px,90vw);height:14px;border-radius:50%;background:#fff;box-shadow:0 4px 10px rgba(85,57,74,.15);max-width:100%}
+.burst{position:fixed;pointer-events:none;z-index:5;animation:up 3s ease-out forwards}
+@keyframes up{to{transform:translate(var(--dx),-90vh) rotate(var(--r));opacity:0}}
+footer{text-align:center;color:var(--soft);font-size:.85rem}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.lines p,.credits .r{opacity:1;transform:none}}
+</style>
+</head>
+<body>
+
+<canvas id="bg" aria-hidden="true"></canvas>
+<main>
+  <header>
+    <p class="hi">Hi Munchkin</p>
+    <h1>5 little gifts before <span>your birthday</span></h1>
+    <p class="sub">A new gift opens every day at midnight until your birthday. Tap the gift to unwrap it. No peeking ahead!</p>
+  </header>
+
+  <nav class="gifts" id="gifts" aria-label="Gifts"></nav>
+  <p class="next" id="next" aria-live="polite"></p>
+
+  <!-- 24 Oct -->
+  <section class="card" data-day="0" hidden>
+    <span class="tag">Day 1 of 5</span>
+    <h2>How it all <span>started</span></h2>
+    <p class="soft">A little storybook about us. Flip the pages.</p>
+    <div class="book" id="book" aria-live="polite">
+      <div class="page" id="page"></div>
+      <div class="pnav">
+        <button class="pbtn" id="prev" aria-label="Previous page">‹</button>
+        <div class="dots" id="dots"></div>
+        <button class="pbtn" id="nextp" aria-label="Next page">›</button>
+      </div>
+    </div>
+    <button class="btn light" id="wholeBtn">Read it as one letter</button>
+    <div class="letter" id="whole" hidden>
+      <p>One of the first things that made me genuinely grateful to have you as a friend was the way you showed up for me when I needed help. I still remember when Sulo assigned me that analysis, and I had absolutely no idea how to do it. You taught me everything from the very basics, and even though you were in the middle of your end exams and had so much on your own plate, you stayed up with me until late at night, making sure I understood everything. And the sweetest part? You never even tried to take credit for any of it. You helped me genuinely, without expecting anything in return, and that says so much about the person you are.</p>
+      <p>It wasn't just about helping me with work; it was about how you made time for me even when you barely had time for yourself. And if you remember, I promised you that day that I'd always have your back. I meant every word of it, and I still do. Just as you were there for me, I want you to know that I'll always be there for you, too. I'm so grateful that work brought us together and gave me a friend like you.</p>
+      <p class="from">Much love, Munchkin<br>With love, Jingiiiii</p>
+    </div>
+    <div class="song">
+      <div class="disc" aria-hidden="true"></div>
+      <div class="si"><span class="sl">Our song for today</span><strong>Count on Me</strong><span class="sa">Bruno Mars</span></div>
+    </div>
+    <p class="soft center">Because you can always count on me, Munchkin. Just like I could always count on you.</p>
+    <div class="row">
+      <a class="btn" href="https://www.youtube.com/results?search_query=Bruno+Mars+Count+on+Me" target="_blank" rel="noopener">Play on YouTube</a>
+      <a class="btn light" href="https://open.spotify.com/search/Bruno%20Mars%20Count%20on%20Me" target="_blank" rel="noopener">Open in Spotify</a>
+    </div>
+  </section>
+
+  <!-- 25 Oct -->
+  <section class="card" data-day="1" hidden>
+    <span class="tag">Day 2 of 5</span>
+    <h2>You were there when I needed <span>someone the most</span></h2>
+    <p class="soft">Remember the rainy days? Flip through and watch the sky clear.</p>
+    <div class="book" aria-live="polite">
+      <div class="page" id="page2"></div>
+      <div class="pnav">
+        <button class="pbtn" id="prev2" aria-label="Previous page">‹</button>
+        <div class="dots" id="dots2"></div>
+        <button class="pbtn" id="next2" aria-label="Next page">›</button>
+      </div>
+    </div>
+    <button class="btn light" id="whole2Btn">Read it as one letter</button>
+    <div class="letter" id="whole2" hidden>
+      <p>During my breakup, when I felt so lost and didn't know how to pick myself up, you were one of the people who helped me see that I should never settle for a man who doesn't value me. You saw what I was going through, and even though you had a thousand things on your plate, you still made time for me. We weren't even best friends at that point, but you never made me feel like I was facing everything alone. You didn't care about the time, your workload, or how busy you were. You showed up for me anyway.</p>
+      <p>I'll always remember the first time we went somewhere alone together. It might have seemed like such a small thing to you, but to me, it meant so much. In a time when I felt broken and lost, you made me feel like I still had someone beside me. You didn't leave me behind when I was at my lowest, and I don't think you'll ever truly understand how much that meant to me.</p>
+      <p>Looking back, I'm so thankful that I had you during one of the hardest seasons of my life. Before we even became best friends, you showed me what genuine friendship looks like. Thank you for being there when I needed someone the most. I'll never forget that.</p>
+      <p class="from">Much love, Munchkin<br>With love, Jingiiiii</p>
+    </div>
+  </section>
+
+  <!-- 26 Oct -->
+  <section class="card" data-day="2" hidden>
+    <span class="tag">gift 3 · no matter how late</span>
+    <h2>You were <span>always there</span></h2>
+    <div class="nightsky" id="sky">
+      <span class="time" id="time">7:00 pm</span>
+      <svg class="moon" viewBox="0 0 74 74" aria-hidden="true"><circle cx="37" cy="37" r="30" fill="#fff6c9"/><path d="M26 38 q4 4 8 0 M42 38 q4 4 8 0" stroke="#55394a" stroke-width="2.5" fill="none" stroke-linecap="round"/><circle cx="24" cy="46" r="4" fill="#ffb8cb"/><circle cx="52" cy="46" r="4" fill="#ffb8cb"/><path d="M34 47 q3 3 6 0" stroke="#55394a" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
+      <svg class="desk" viewBox="0 0 300 110" aria-label="Two laptops glowing on a desk late at night">
+        <rect x="0" y="86" width="300" height="10" rx="5" fill="#8a6fae"/>
+        <rect x="40" y="44" width="80" height="44" rx="6" fill="#cbb8ff"/><rect x="46" y="50" width="68" height="32" rx="3" fill="#fff6c9"/>
+        <rect x="180" y="44" width="80" height="44" rx="6" fill="#ffb8cb"/><rect x="186" y="50" width="68" height="32" rx="3" fill="#fff6c9"/>
+        <rect x="52" y="56" width="40" height="4" rx="2" fill="#cbb8ff"/><rect x="52" y="64" width="54" height="4" rx="2" fill="#cbb8ff"/><rect x="52" y="72" width="30" height="4" rx="2" fill="#cbb8ff"/>
+        <rect x="192" y="58" width="12" height="18" rx="2" fill="#f9799f"/><rect x="208" y="64" width="12" height="12" rx="2" fill="#ffb8cb"/><rect x="224" y="54" width="12" height="22" rx="2" fill="#f9799f"/>
+        <rect x="140" y="70" width="18" height="16" rx="4" fill="#fff"/><path d="M158 74 q6 0 6 5 q0 5 -6 5" stroke="#fff" stroke-width="3" fill="none"/><path d="M145 64 q2 -4 0 -8 M152 64 q2 -4 0 -8" stroke="#fff6c9" stroke-width="2" fill="none" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <button class="btn" id="nightBtn">Replay those nights</button>
+    <div class="lines" id="lines">
+      <p>Late nights, when everyone else was asleep. You were there.</p>
+      <p>Your exam days, when you had your own studying to do. You were there.</p>
+      <p>Even on your leave days, when you were supposed to rest. You were there.</p>
+      <p>No matter how late it got, you never once said you were too tired.</p>
+      <p>You didn't just help me with work. You connected with me.</p>
+      <p>And since then, you've always had my back.</p>
+    </div>
+  </section>
+
+  <!-- 27 Oct -->
+  <section class="card" data-day="3" hidden>
+    <span class="tag">gift 4 · the credit you never got</span>
+    <h2>Giving you <span>your credit</span></h2>
+    <p class="soft">You did all of this and never took any credit. So here it is, the way it should have been.</p>
+    <div class="credits" id="credits">
+      <p class="ct">Starring</p>
+      <div class="r"><span class="role">Analysing everything, one by one</span><span class="who">Munchkin</span></div>
+      <div class="r"><span class="role">Teaching me everything</span><span class="who">Munchkin</span></div>
+      <div class="r"><span class="role">Breaking it into pieces so I could create it</span><span class="who">Munchkin</span></div>
+      <div class="r"><span class="role">Staying up late, preparing it for me</span><span class="who">Munchkin</span></div>
+      <div class="r"><span class="role">Showing my work to others</span><span class="who">Munchkin</span></div>
+      <div class="r"><span class="role">Praising me in front of everyone</span><span class="who">Munchkin</span></div>
+      <div class="r zero"><span class="role">Credit she asked for</span><span class="who">None</span></div>
+      <div class="r final"><span class="role">Thank you, from the bottom of my heart</span><span class="who">Thank you, Munchkin</span></div>
+    </div>
+    <button class="btn" id="rollBtn">Roll the credits</button>
+    <p class="soft center" style="margin-top:8px">And one more thing. There's a promise sealed in here.</p>
+    <button class="env" id="env" aria-label="Open the promise">
+      <span class="b"></span><span class="f"></span>
+      <svg class="seal" viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="23" fill="#f9799f"/><path d="M24 11 l3.6 8 8.7 .9 -6.5 5.8 1.9 8.6 -7.7 -4.5 -7.7 4.5 1.9 -8.6 -6.5 -5.8 8.7 -.9z" fill="#fff"/></svg>
+    </button>
+    <div class="stack" id="promiseWrap" hidden>
+      <p class="promise">Back then I promised you:<br>"If you remember this,<br>I'll have your back,<br>no matter what the situation."</p>
+      <div class="letter">
+        <p>I remember, Munchkin. And I meant every word.</p>
+        <p>You had my back through the hardest days of my job. Now, whatever you're going through, whatever days feel heavy, I'm right here.</p>
+        <p>As I promised, I still got your back. Always.</p>
+        <p class="from">Much love, Munchkin<br>With love, Jingiiiii</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 28 Oct -->
+  <section class="card" data-day="4" hidden>
+    <span class="tag">gift 5 · 28 october</span>
+    <h2>Happy birthday, <span>Munchkin!</span></h2>
+    <p class="soft center">Five candles, one for each gift. Blow them out one by one and make a wish each time.</p>
+    <div class="cake" aria-label="Birthday cake">
+      <div class="candles" id="candles"></div>
+      <div class="layer l1"></div>
+      <div class="layer l2"><i style="left:14%"></i><i style="left:32%;background:var(--pink)"></i><i style="left:50%"></i><i style="left:68%;background:var(--pink)"></i><i style="left:84%"></i></div>
+      <div class="plate"></div>
+    </div>
+    <p class="count" id="wc">5 candles left</p>
+    <div class="letter" id="bday" hidden>
+      <p>Happy birthday, Munchkin.</p>
+      <p>Everything I can do in my job today, I can do because of you. You analysed it with me, taught me, broke it into pieces, stayed up late for me, and then stood in front of everyone and gave me the credit.</p>
+      <p>Today, I want to give some of that back. You are the kindest, most selfless person I know. You deserve to be celebrated loudly, today and every day.</p>
+      <p>Thank you for having my back when I had nothing figured out. As I promised, I still have yours. No matter how late, no matter what the situation. Always.</p>
+      <p class="from">Much love, Munchkin<br>With love, Jingiiiii</p>
+    </div>
+  </section>
+
+  <footer>made with so much love by Jingiiiii, for Munchkin</footer>
+</main>
+
+<script>
+// Unlock times in Sri Lanka time (UTC+5:30): Day 1 now, Days 2-4 every 24h at 10:30 pm, birthday at midnight on the 28th.
+// Add #preview to the link to see them all.
+const DATES=[24,25,26,27,28],COLORS=['#ffb8cb','#cbb8ff','#b8ead8','#ffd3b0','#f9799f'];
+const UNLOCK=DATES.map(d=>Date.UTC(2026,9,d-1,18,30)); // 12:00 am Sri Lanka time on each date
+const preview=location.hash==='#preview';
+const isOpen=i=>preview||Date.now()>=UNLOCK[i];
+const still=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const giftsEl=document.getElementById('gifts'),cards=[...document.querySelectorAll('.card')];
+function show(i){cards.forEach((c,k)=>c.hidden=k!==i);[...giftsEl.children].forEach((g,k)=>g.classList.toggle('cur',k===i));
+  const g=giftsEl.children[i];g.classList.add('open');g.querySelector('.st').textContent=i===4?'happy bday!':'opened';
+  if(i===2)playNight();if(i===3)rollCredits();}
+function render(){giftsEl.innerHTML='';
+  DATES.forEach((d,i)=>{const o=isOpen(i);const g=document.createElement('button');g.className='gift';g.id='gift'+i;g.style.setProperty('--c',COLORS[i]);
+    g.innerHTML='<span class="box" aria-hidden="true"><span class="base"></span><span class="rib"></span><span class="lid"></span><span class="bow"></span></span><span class="dt">'+d+' Oct</span><span class="st">'+(o?'tap me':'soon')+'</span>';
+    g.setAttribute('aria-label','Gift '+(i+1)+', '+d+' October'+(o?'':', not yet'));g.disabled=!o;
+    g.onclick=()=>{show(i);setTimeout(()=>cards[i].scrollIntoView({behavior:'smooth',block:'start'}),350);};giftsEl.appendChild(g);});}
+const nextEl=document.getElementById('next');
+function tick(){const i=DATES.findIndex((d,k)=>!isOpen(k));
+  if(i<0){nextEl.textContent=preview?'preview mode: all gifts unlocked':'all gifts unwrapped';return;}
+  const ms=UNLOCK[i]-Date.now();if(ms<=0){render();return;}
+  const h=Math.floor(ms/3600e3),m=Math.floor(ms%3600e3/60e3),s=Math.floor(ms%60e3/1e3);
+  nextEl.textContent='next gift in '+h+'h '+String(m).padStart(2,'0')+'m '+String(s).padStart(2,'0')+'s';}
+render();tick();setInterval(tick,1000);
+
+// Day 1: storybook
+const blob=(x,y,c,mood)=>'<g><ellipse cx="'+x+'" cy="'+y+'" rx="24" ry="21" fill="'+c+'"/><circle cx="'+(x-8)+'" cy="'+(y-3)+'" r="2.6" fill="#55394a"/><circle cx="'+(x+8)+'" cy="'+(y-3)+'" r="2.6" fill="#55394a"/><circle cx="'+(x-13)+'" cy="'+(y+5)+'" r="3.5" fill="#fff" opacity=".55"/><circle cx="'+(x+13)+'" cy="'+(y+5)+'" r="3.5" fill="#fff" opacity=".55"/>'+
+  (mood==='sad'?'<path d="M'+(x-5)+' '+(y+9)+' q5 -5 10 0" stroke="#55394a" stroke-width="2" fill="none" stroke-linecap="round"/>':'<path d="M'+(x-5)+' '+(y+6)+' q5 5 10 0" stroke="#55394a" stroke-width="2" fill="none" stroke-linecap="round"/>')+'</g>';
+const spk=(x,y,s,c)=>'<path d="M'+x+' '+(y-s)+' Q'+x+' '+y+' '+(x+s)+' '+y+' Q'+x+' '+y+' '+x+' '+(y+s)+' Q'+x+' '+y+' '+(x-s)+' '+y+' Q'+x+' '+y+' '+x+' '+(y-s)+'z" fill="'+(c||'#ffd36b')+'"/>';
+const PINK='#ffb8cb',LAV='#cbb8ff',svg=b=>'<svg viewBox="0 0 200 130" aria-hidden="true">'+b+'</svg>';
+const pages=[
+ {pic:svg('<rect x="0" y="112" width="200" height="6" rx="3" fill="#f3dbe4"/>'+blob(62,90,PINK,'sad')+blob(140,90,LAV,'happy')+spk(118,50,8)+spk(168,40,6,'#f9799f')+spk(150,24,5)),
+  t:"One of the first things that made me genuinely grateful to have you as a friend was the way you showed up for me when I needed help."},
+ {pic:svg('<rect x="104" y="18" width="72" height="88" rx="6" fill="#fff" stroke="#f3dbe4" stroke-width="3"/><rect x="116" y="34" width="48" height="5" rx="2.5" fill="#cbb8ff"/><rect x="116" y="48" width="36" height="5" rx="2.5" fill="#cbb8ff"/><rect x="116" y="62" width="44" height="5" rx="2.5" fill="#cbb8ff"/><text x="140" y="96" text-anchor="middle" font-family="Fredoka,sans-serif" font-size="18" fill="#f9799f">analysis</text>'+blob(54,92,PINK,'sad')+'<text x="34" y="52" font-family="Fredoka,sans-serif" font-size="22" fill="#f9799f">?</text><text x="58" y="40" font-family="Fredoka,sans-serif" font-size="28" fill="#cbb8ff">?</text><text x="80" y="56" font-family="Fredoka,sans-serif" font-size="18" fill="#f9799f">?</text>'),
+  t:"I still remember when Sulo assigned me that analysis, and I had absolutely no idea how to do it."},
+ {pic:svg('<rect x="20" y="16" width="160" height="60" rx="8" fill="#b8ead8"/><text x="100" y="54" text-anchor="middle" font-family="Fredoka,sans-serif" font-size="24" fill="#55394a">A · B · C</text>'+blob(64,104,PINK,'happy')+blob(136,104,LAV,'happy')+'<path d="M158 98 l18 -22" stroke="#cbb8ff" stroke-width="5" stroke-linecap="round"/>'),
+  t:"You taught me everything from the very basics,"},
+ {pic:svg('<rect width="200" height="130" rx="14" fill="#3b3a6b"/>'+spk(30,22,4,'#fff6c9')+spk(70,14,3,'#fff6c9')+spk(120,26,3,'#fff6c9')+'<circle cx="166" cy="30" r="16" fill="#fff6c9"/><rect x="12" y="84" width="40" height="10" rx="2" fill="#ffd3b0"/><rect x="16" y="74" width="34" height="10" rx="2" fill="#ffb8cb"/><rect x="14" y="64" width="38" height="10" rx="2" fill="#cbb8ff"/><text x="32" y="58" text-anchor="middle" font-family="Fredoka,sans-serif" font-size="10" fill="#fff6c9">exams</text><rect x="80" y="70" width="44" height="28" rx="4" fill="#fff6c9" opacity=".9"/>'+blob(82,108,PINK,'happy')+blob(140,108,LAV,'happy')),
+  t:"and even though you were in the middle of your end exams and had so much on your own plate, you stayed up with me until late at night, making sure I understood everything."},
+ {pic:svg('<path d="M86 30 h28 v18 a14 14 0 0 1 -28 0z" fill="#ffd36b"/><rect x="96" y="60" width="8" height="12" fill="#ffd36b"/><rect x="88" y="72" width="24" height="6" rx="3" fill="#ffd36b"/>'+spk(70,28,6)+spk(132,22,7,'#f9799f')+blob(54,100,LAV,'happy')+blob(146,100,PINK,'happy')+'<path d="M76 92 q24 -16 46 0" stroke="#cbb8ff" stroke-width="3" fill="none" stroke-dasharray="4 5"/>'),
+  t:"And the sweetest part? You never even tried to take credit for any of it. You helped me genuinely, without expecting anything in return, and that says so much about the person you are."},
+ {pic:svg('<circle cx="100" cy="62" r="44" fill="#fff" stroke="#ffb8cb" stroke-width="5"/><path d="M100 62 v-30 M100 62 l18 10" stroke="#55394a" stroke-width="4" stroke-linecap="round"/><circle cx="100" cy="62" r="4" fill="#f9799f"/>'+spk(160,30,8)+spk(40,40,6,'#cbb8ff')+spk(156,96,5,'#f9799f')),
+  t:"It wasn't just about helping me with work; it was about how you made time for me even when you barely had time for yourself."},
+ {pic:svg('<rect x="44" y="26" width="112" height="78" rx="8" fill="#fff8ef" stroke="#ffd3b0" stroke-width="3"/><rect x="36" y="20" width="16" height="90" rx="8" fill="#ffd3b0"/><rect x="148" y="20" width="16" height="90" rx="8" fill="#ffd3b0"/><text x="100" y="56" text-anchor="middle" font-family="Gochi Hand,cursive" font-size="17" fill="#55394a">I\'ll always</text><text x="100" y="76" text-anchor="middle" font-family="Gochi Hand,cursive" font-size="17" fill="#55394a">have your back</text><circle cx="100" cy="100" r="11" fill="#f9799f"/>'+spk(100,100,6,'#fff')),
+  t:"And if you remember, I promised you that day that I'd always have your back. I meant every word of it, and I still do."},
+ {pic:svg('<rect x="0" y="112" width="200" height="6" rx="3" fill="#f3dbe4"/>'+blob(74,90,LAV,'happy')+blob(126,90,PINK,'happy')+'<path d="M96 96 q4 4 8 0" stroke="#55394a" stroke-width="3" fill="none" stroke-linecap="round"/>'+spk(100,40,9)+spk(60,34,5,'#f9799f')+spk(146,30,6,'#cbb8ff')+'<g fill="#b8ead8"><circle cx="24" cy="104" r="6"/><circle cx="176" cy="104" r="6"/></g>'),
+  t:"Just as you were there for me, I want you to know that I'll always be there for you, too. I'm so grateful that work brought us together and gave me a friend like you.",sign:true}
+];
+let pg=0;const pageEl=document.getElementById('page'),dotsEl=document.getElementById('dots'),prevB=document.getElementById('prev'),nextB=document.getElementById('nextp');
+pages.forEach(()=>dotsEl.appendChild(document.createElement('span')));
+function drawPage(){const p=pages[pg];pageEl.style.animation='none';void pageEl.offsetWidth;pageEl.style.animation='';
+  pageEl.innerHTML=p.pic+'<span class="pn">page '+(pg+1)+' of '+pages.length+'</span><p>'+p.t+'</p>'+(p.sign?'<p class="from">Much love, Munchkin<br>With love, Jingiiiii</p>':'');
+  [...dotsEl.children].forEach((d,k)=>d.classList.toggle('on',k===pg));prevB.disabled=pg===0;nextB.disabled=pg===pages.length-1;
+  if(p.sign)pop(pageEl);}
+prevB.onclick=()=>{if(pg>0){pg--;drawPage();}};nextB.onclick=()=>{if(pg<pages.length-1){pg++;drawPage();}};
+let sx=null;pageEl.addEventListener('touchstart',e=>{sx=e.touches[0].clientX;},{passive:true});
+pageEl.addEventListener('touchend',e=>{if(sx===null)return;const dx=e.changedTouches[0].clientX-sx;sx=null;if(dx<-40)nextB.click();else if(dx>40)prevB.click();});
+drawPage();
+document.getElementById('wholeBtn').onclick=e=>{const w=document.getElementById('whole');w.hidden=!w.hidden;e.target.textContent=w.hidden?'Read it as one letter':'Hide the letter';};
+
+// Gift 2: flowers
+const flower=c=>'<svg viewBox="0 0 52 52" aria-hidden="true"><g fill="'+c+'"><circle cx="26" cy="13" r="9"/><circle cx="38.4" cy="22" r="9"/><circle cx="33.6" cy="36.5" r="9"/><circle cx="18.4" cy="36.5" r="9"/><circle cx="13.6" cy="22" r="9"/></g><circle cx="26" cy="26" r="7" fill="#fff1a8"/></svg>';
+const things=[
+ "You analysed everything with me, one by one.",
+ "You broke it into small pieces so I knew how to create it.",
+ "You taught me everything, patiently, again and again.",
+ "You stayed up late preparing it for me.",
+ "You showed my work to others and told them how good it was.",
+ "You praised me in front of people, when the credit was really yours."
+];
+// Day 2: rain to sunshine storybook
+const S2=(b)=>'<svg viewBox="0 0 200 130" aria-hidden="true"><defs><clipPath id="c2"><rect width="200" height="130" rx="14"/></clipPath></defs><g clip-path="url(#c2)">'+b+'</g></svg>';
+const sky2=c=>'<rect width="200" height="130" fill="'+c+'"/>';
+const cloud2=(x,y,c,s)=>{s=s||1;return '<g fill="'+c+'" transform="translate('+x+' '+y+') scale('+s+')"><ellipse cx="0" cy="0" rx="28" ry="12"/><circle cx="-13" cy="-6" r="12"/><circle cx="9" cy="-10" r="15"/></g>';};
+const rain2=(n,x0,x1,y0)=>{let r='';for(let i=0;i<n;i++){const x=x0+((i*37)%(x1-x0)),y=(y0||40)+(i*13)%20;r+='<line class="drop" x1="'+x+'" y1="'+y+'" x2="'+(x-2)+'" y2="'+(y+8)+'" style="animation-delay:-'+((i*0.17)%0.9).toFixed(2)+'s"/>';}return r;};
+const ground2=c=>'<rect x="0" y="116" width="200" height="14" fill="'+c+'"/>';
+const umb=(x,y)=>'<path d="M'+(x-38)+' '+y+' a38 24 0 0 1 76 0z" fill="#f9799f"/><path d="M'+(x-38)+' '+y+' q9.5 6 19 0 q9.5 6 19 0 q9.5 6 19 0 q9.5 6 19 0" fill="#f9799f"/><line x1="'+x+'" y1="'+(y-24)+'" x2="'+x+'" y2="'+(y+30)+'" stroke="#55394a" stroke-width="2.5" stroke-linecap="round"/>';
+const papers=(x,y)=>'<g><rect x="'+x+'" y="'+(y+16)+'" width="26" height="8" rx="2" fill="#fff"/><rect x="'+(x+2)+'" y="'+(y+8)+'" width="26" height="8" rx="2" fill="#fff8ef"/><rect x="'+x+'" y="'+y+'" width="26" height="8" rx="2" fill="#fff"/><text x="'+(x+13)+'" y="'+(y-4)+'" text-anchor="middle" font-family="Fredoka,sans-serif" font-size="9" fill="#fff">work</text></g>';
+const sun2=(x,y)=>{let r='<circle cx="'+x+'" cy="'+y+'" r="14" fill="#ffd36b"/>';for(let a=0;a<8;a++){const t=a*Math.PI/4;r+='<line x1="'+(x+Math.cos(t)*19)+'" y1="'+(y+Math.sin(t)*19)+'" x2="'+(x+Math.cos(t)*25)+'" y2="'+(y+Math.sin(t)*25)+'" stroke="#ffd36b" stroke-width="3" stroke-linecap="round"/>';}return r;};
+const flw=(x,y,c)=>'<g fill="'+c+'"><circle cx="'+x+'" cy="'+(y-3)+'" r="3"/><circle cx="'+(x+3)+'" cy="'+y+'" r="3"/><circle cx="'+x+'" cy="'+(y+3)+'" r="3"/><circle cx="'+(x-3)+'" cy="'+y+'" r="3"/></g><circle cx="'+x+'" cy="'+y+'" r="1.8" fill="#fff1a8"/>';
+const rainbow=()=>['#f9799f','#ffd3b0','#fff1a8','#b8ead8','#bfe0ff','#cbb8ff'].map((c,i)=>'<path d="M'+(14+i*7)+' 118 A'+(86-i*7)+' '+(86-i*7)+' 0 0 1 '+(186-i*7)+' 118" stroke="'+c+'" stroke-width="7" fill="none"/>').join('');
+const pages2=[
+ {pic:S2(sky2('#8d97b5')+cloud2(100,30,'#6c7594',1.2)+rain2(16,20,180)+ground2('#b9c4d6')+blob(100,96,PINK,'sad')),
+  t:"During my breakup, when I felt so lost and didn't know how to pick myself up, you were one of the people who helped me see that I should never settle for a man who doesn't value me."},
+ {pic:S2(sky2('#8d97b5')+cloud2(70,28,'#6c7594')+rain2(12,20,180)+ground2('#b9c4d6')+blob(66,96,PINK,'sad')+blob(140,96,LAV,'happy')+papers(166,52)),
+  t:"You saw what I was going through, and even though you had a thousand things on your plate, you still made time for me."},
+ {pic:S2(sky2('#9aa6c4')+cloud2(40,24,'#7d86a6')+rain2(12,0,200,20)+ground2('#c3cde0')+umb(104,52)+blob(82,96,PINK,'happy')+blob(128,96,LAV,'happy')+'<g transform="rotate(-14 176 112)"><rect x="166" y="108" width="22" height="7" rx="2" fill="#fff"/></g><rect x="150" y="113" width="20" height="6" rx="2" fill="#fff8ef"/>'),
+  t:"We weren't even best friends at that point, but you never made me feel like I was facing everything alone. You didn't care about the time, your workload, or how busy you were. You showed up for me anyway."},
+ {pic:S2(sky2('#b3c3e0')+cloud2(150,24,'#dfe6f3',.8)+rain2(5,120,190,30)+'<path d="M0 124 Q100 98 200 124 L200 130 L0 130z" fill="#ffd3b0"/><rect x="0" y="122" width="200" height="8" fill="#b8ead8"/><rect x="170" y="70" width="5" height="44" fill="#a98467"/><circle cx="172" cy="64" r="18" fill="#b8ead8"/><rect x="24" y="80" width="3" height="34" fill="#a98467"/><rect x="12" y="78" width="30" height="12" rx="3" fill="#fff"/><text x="27" y="87" text-anchor="middle" font-family="Fredoka,sans-serif" font-size="7" fill="#55394a">just us</text>'+blob(80,98,PINK,'happy')+blob(122,98,LAV,'happy')+'<path d="M50 96 h-8 M52 104 h-10" stroke="#fff" stroke-width="2" stroke-linecap="round"/>'),
+  t:"I'll always remember the first time we went somewhere alone together. It might have seemed like such a small thing to you, but to me, it meant so much."},
+ {pic:S2(sky2('#c9d6ef')+cloud2(40,26,'#eef2fa',.7)+cloud2(160,34,'#eef2fa',.6)+ground2('#b8ead8')+blob(88,96,PINK,'happy')+blob(116,96,LAV,'happy')+spk(102,50,8)+spk(70,40,4,'#fff')+spk(140,44,5,'#f9799f')),
+  t:"In a time when I felt broken and lost, you made me feel like I still had someone beside me. You didn't leave me behind when I was at my lowest, and I don't think you'll ever truly understand how much that meant to me."},
+ {pic:S2(sky2('#ffe9c7')+sun2(160,34)+cloud2(46,30,'#fff',.6)+ground2('#b8ead8')+flw(20,112,'#f9799f')+flw(40,118,'#cbb8ff')+flw(170,114,'#ffb8cb')+flw(188,120,'#f9799f')+blob(82,96,PINK,'happy')+blob(124,96,LAV,'happy')),
+  t:"Looking back, I'm so thankful that I had you during one of the hardest seasons of my life. Before we even became best friends, you showed me what genuine friendship looks like."},
+ {pic:S2(sky2('#ffe6ee')+sun2(158,34)+ground2('#b8ead8')+flw(24,118,'#f9799f')+flw(44,122,'#cbb8ff')+flw(160,120,'#ffb8cb')+flw(180,116,'#f9799f')+blob(80,100,PINK,'happy')+blob(122,100,LAV,'happy')+'<path d="M98 106 q3 3 6 0" stroke="#55394a" stroke-width="3" fill="none" stroke-linecap="round"/>'+spk(100,46,8)+spk(54,30,5,'#f9799f')+spk(100,20,4,'#cbb8ff')),
+  t:"Thank you for being there when I needed someone the most. I'll never forget that.",sign:true}
+];
+let pg2=0;const p2=document.getElementById('page2'),d2=document.getElementById('dots2'),pv2=document.getElementById('prev2'),nx2=document.getElementById('next2');
+pages2.forEach(()=>d2.appendChild(document.createElement('span')));
+function drawPage2(){const p=pages2[pg2];p2.style.animation='none';void p2.offsetWidth;p2.style.animation='';
+  p2.innerHTML=p.pic+'<span class="pn">page '+(pg2+1)+' of '+pages2.length+'</span><p>'+p.t+'</p>'+(p.sign?'<p class="from">Much love, Munchkin<br>With love, Jingiiiii</p>':'');
+  [...d2.children].forEach((d,k)=>d.classList.toggle('on',k===pg2));pv2.disabled=pg2===0;nx2.disabled=pg2===pages2.length-1;if(p.sign)pop(p2);}
+pv2.onclick=()=>{if(pg2>0){pg2--;drawPage2();}};nx2.onclick=()=>{if(pg2<pages2.length-1){pg2++;drawPage2();}};
+let sx2=null;p2.addEventListener('touchstart',e=>{sx2=e.touches[0].clientX;},{passive:true});
+p2.addEventListener('touchend',e=>{if(sx2===null)return;const dx=e.changedTouches[0].clientX-sx2;sx2=null;if(dx<-40)nx2.click();else if(dx>40)pv2.click();});
+drawPage2();
+document.getElementById('whole2Btn').onclick=e=>{const w=document.getElementById('whole2');w.hidden=!w.hidden;e.target.textContent=w.hidden?'Read it as one letter':'Hide the letter';};
+
+// Gift 3: night scene
+const sky=document.getElementById('sky');
+for(let i=0;i<22;i++){const s=document.createElement('span');s.className='star';s.style.left=Math.random()*94+'%';s.style.top=Math.random()*45+'%';
+  s.style.transitionDelay=Math.random()*2+'s';s.style.animationDelay=Math.random()*2+'s';sky.appendChild(s);}
+let nt=[];
+function playNight(){nt.forEach(clearTimeout);nt=[];sky.classList.remove('lit');const lines=[...document.querySelectorAll('#lines p')];lines.forEach(p=>p.classList.remove('show'));
+  const times=['7:00 pm','8:00 pm','9:00 pm','10:00 pm','11:00 pm','12:00 am'],tEl=document.getElementById('time');tEl.textContent=times[0];
+  nt.push(setTimeout(()=>sky.classList.add('lit'),300));
+  times.forEach((t,k)=>nt.push(setTimeout(()=>{tEl.textContent=t;if(lines[k])lines[k].classList.add('show');},still?0:700+k*1300)));}
+document.getElementById('nightBtn').onclick=playNight;
+
+// Gift 4: credits + promise
+let ct=[];
+function rollCredits(){ct.forEach(clearTimeout);ct=[];const rows=[...document.querySelectorAll('#credits .r')];rows.forEach(r=>r.classList.remove('show'));
+  rows.forEach((r,k)=>ct.push(setTimeout(()=>r.classList.add('show'),still?0:500+k*1000)));}
+document.getElementById('rollBtn').onclick=rollCredits;
+document.getElementById('env').onclick=e=>{const env=e.currentTarget;if(env.classList.contains('open'))return;env.classList.add('open');
+  setTimeout(()=>{document.getElementById('promiseWrap').hidden=false;},600);};
+
+// Gift 5: cake
+const cEl=document.getElementById('candles'),wc=document.getElementById('wc');let left=5;
+for(let i=0;i<5;i++){const b=document.createElement('button');b.className='cdl';b.id='candle'+i;b.setAttribute('aria-label','Blow out candle '+(i+1));
+  b.innerHTML='<span class="fl"></span><span class="stk"></span>';
+  b.onclick=()=>{if(b.classList.contains('out'))return;b.classList.add('out');left--;
+    wc.textContent=left?left+' candle'+(left>1?'s':'')+' left · make a wish':'all your wishes are coming true';
+    if(!left){document.getElementById('bday').hidden=false;party();}};cEl.appendChild(b);}
+
+function sparkle(c,sz){return '<svg width="'+sz+'" height="'+sz+'" viewBox="0 0 20 20"><path d="M10 0 C11 7 13 9 20 10 C13 11 11 13 10 20 C9 13 7 11 0 10 C7 9 9 7 10 0z" fill="'+c+'"/></svg>';}
+function pop(el){if(still)return;const r=el.getBoundingClientRect();
+  for(let i=0;i<8;i++){const s=document.createElement('span');s.className='burst';s.innerHTML=sparkle(['#f9799f','#cbb8ff','#ffd36b'][i%3],14);
+    s.style.left=(r.left+r.width/2)+'px';s.style.top=(r.top+r.height/2)+'px';s.style.setProperty('--dx',(Math.random()*120-60)+'px');s.style.setProperty('--r',(Math.random()*180-90)+'deg');
+    s.style.animationDuration='1.6s';document.body.appendChild(s);setTimeout(()=>s.remove(),1700);}}
+function party(){if(still)return;
+  for(let i=0;i<60;i++){const s=document.createElement('span');s.className='burst';const c=['#f9799f','#cbb8ff','#ffd3b0','#b8ead8','#ffd36b'][i%5];
+    s.innerHTML=i%3?sparkle(c,12+Math.random()*16):flower(c).replace('<svg ','<svg width="22" height="22" ');
+    s.style.left=Math.random()*100+'vw';s.style.top=(90+Math.random()*10)+'vh';
+    s.style.setProperty('--dx',(Math.random()*120-60)+'px');s.style.setProperty('--r',(Math.random()*360-180)+'deg');s.style.animationDelay=Math.random()*1.2+'s';
+    document.body.appendChild(s);setTimeout(()=>s.remove(),4500);}}
+
+// floating stars and little flowers in the background
+const cv=document.getElementById('bg'),cx=cv.getContext('2d');let fs=[];
+function size(){const d=devicePixelRatio;cv.width=innerWidth*d;cv.height=innerHeight*d;
+  fs=Array.from({length:20},(_,k)=>({k:k%2,x:Math.random()*cv.width,y:Math.random()*cv.height,s:(5+Math.random()*7)*d,v:(.12+Math.random()*.3)*d,c:['#ffb8cb','#cbb8ff','#ffd3b0','#b8ead8'][k%4],p:Math.random()*6}));}
+function star(x,y,s){cx.beginPath();cx.moveTo(x,y-s);cx.quadraticCurveTo(x,y,x+s,y);cx.quadraticCurveTo(x,y,x,y+s);cx.quadraticCurveTo(x,y,x-s,y);cx.quadraticCurveTo(x,y,x,y-s);cx.fill();}
+function bloom(x,y,s){for(let a=0;a<5;a++){const t=a*Math.PI*2/5;cx.beginPath();cx.arc(x+Math.cos(t)*s*.55,y+Math.sin(t)*s*.55,s*.45,0,7);cx.fill();}
+  cx.fillStyle='#fff1a8';cx.beginPath();cx.arc(x,y,s*.32,0,7);cx.fill();}
+function draw(t){cx.clearRect(0,0,cv.width,cv.height);fs.forEach(f=>{cx.globalAlpha=.5;cx.fillStyle=f.c;const x=f.x+Math.sin(t/1600+f.p)*10*devicePixelRatio;
+  f.k?star(x,f.y,f.s):bloom(x,f.y,f.s);if(!still){f.y-=f.v;if(f.y<-30)f.y=cv.height+20;}});if(!still)requestAnimationFrame(draw);}
+size();addEventListener('resize',size);requestAnimationFrame(draw);
+</script>
+</body>
+</html>
